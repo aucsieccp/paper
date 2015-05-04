@@ -16,5 +16,5 @@ handlers:
   script: edit.app
 - url: /paper
   script: paper.app
-- url: /Main
+- url: /
   script: Cloud.app

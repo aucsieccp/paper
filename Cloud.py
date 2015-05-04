@@ -34,7 +34,7 @@ class MainPage(webapp2.RequestHandler):
 			self.response.write('<a href="%s">Sign Out<a><br>' % users.create_logout_url(self.request.url))
 			self.response.headers['Content-Type'] = 'text/html'
 			self.response.write('	<form method="post"> \
-										<button formaction="/upload" type="submit">add</button> \
+										<button formaction="/Add/AddPage" type="submit">add</button> \
 									</form>')
 			self.response.write('<a href="%s">Logout</a>' % users.create_logout_url(self.request.url))
 		else:

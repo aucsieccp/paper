@@ -11,7 +11,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 		blob_info = upload_files[0]
 		self.response.headers['Content-Type'] = 'text/html'
 		self.response.write('<h1>Upload Done~~!!!</h1>')
-		self.response.write('<a href="%s">Main Page</a>' %('/Main'))
+		self.response.write('<a href="%s">Main Page</a>' %('/'))
 
 
 
