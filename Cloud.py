@@ -42,17 +42,20 @@ class MainPage(webapp2.RequestHandler):
 
 		self.response.headers['Content-Type'] = 'text/html'
 		self.response.headers['Content-Type'] = 'text/html'
-		self.response.write('<h1>Your myS3 file list</h1>')
 		self.response.write('<form method="post"><TABLE BORDER="1">')
 		self.response.write('<TR><TD>Year</TD><TD>Source</TD><TD>Name</TD><TD>Time</TD><<TD>publis</TD></TR>')
 
-		qry = blobstore.BlobInfo.all()
-		for blobinfo in qry:
+		qry = Paper.query()
+		for database in qry:
 			self.response.write('<TR>')	
-			self.response.write('<TD>%s</TD>' % blobinfo.filename)
-			self.response.write('<TD>%s</TD>' % str(blobinfo.creation))
+			self.response.write('<TD>%s</TD>' % database.publish_year)
+			self.response.write('<TD>%s</TD>' % database.source)
+			self.response.write('<TD>%s</TD>' % database.name)
+			self.response.write('<TD>%s</TD>' % database.time)
+			self.response.write('<TD>%s</TD>' % database.title)
+			
 			self.response.write('<TD>')
-			#self.response.write('<button name="resource" value="%s" formaction="/myS3/download" type="submit">Download</button>' % str(blobinfo.key()))
+			self.response.write('<button name="resource" value="%s" formaction="/edit/edit" type="submit">edit</button>' %database.name)
 			#self.response.write('<button name="resource" value="%s" formaction="/myS3/delete" type="submit">Delete</button>' % str(blobinfo.key()))
 			self.response.write('</TD>')
 			self.response.write('</TR>')
