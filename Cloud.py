@@ -1,36 +1,19 @@
 ﻿from google.appengine.api import users
 from google.appengine.ext import ndb
+from google.appengine.ext import blobstore
 import webapp2
 import sys
 import datetime
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
-MAIN_PAGE_HTML = """\
+UPLOAD_HTML = """\
 <html>
-	<body>
-		<form action="/AddPage" method="post">
-			<div><input type="submit" value="Add"></div>
-		</form>
+  <body>
+    <form action="%s" method="post" enctype="multipart/form-data">
+    </form>
   </body>
 </html>
-
-"""
-
-
-AddPage_HTML = """\
-<html>
-	<body>
-		<form action="/add" method="post">
-		<div>Publish year:<br><input name="publish_year" rows="3" cols="60"></input></div>
-		<div>Source:<br><input name="source" rows="3" cols="60"></input></div>
-		<div>Title:<br><input name="title" rows="3" cols="60"></input></div>
-		<div><input type="submit" value="add"></div>
-		</form>
-	</body>
-</html>
-
 """
 
 class Paper(ndb.Model):
@@ -39,24 +22,6 @@ class Paper(ndb.Model):
 	name = ndb.StringProperty()
 	time = ndb.DateTimeProperty(auto_now_add=True)
 	publish_year = ndb.StringProperty()
-	
-class AddPage(webapp2.RequestHandler):
-	def post(self):
-		self.response.headers['Content-Type'] = 'text/html'
-		self.response.write(AddPage_HTML)
-	
-class Add(webapp2.RequestHandler):
-	def post(self):
-		uuu = users.get_current_user()
-		name = uuu.nickname()
-		publish_year = self.request.get("publish_year")
-		source = self.request.get("source")
-		title = self.request.get("title")
-		new_paper = Paper(name=name,publish_year=publish_year,title=title,source=source)
-		new_paper_key = new_paper.put()
-		
-		self.response.headers['Content-Type'] = 'text/html'
-		self.response.write('Sucess')
 
 class MainPage(webapp2.RequestHandler):
 	def get(self):
@@ -67,13 +32,35 @@ class MainPage(webapp2.RequestHandler):
 				self.response.write("%s-%s-%s-%s-%s<br>" %(a.publish_year,a.source,a.title,a.name,a.time))
 			self.response.headers['Content-Type'] = 'text/html'
 			self.response.write('<a href="%s">Sign Out<a><br>' % users.create_logout_url(self.request.url))
+			self.response.headers['Content-Type'] = 'text/html'
+			self.response.write('	<form method="post"> \
+										<button formaction="/upload" type="submit">add</button> \
+									</form>')
+			self.response.write('<a href="%s">Logout</a>' % users.create_logout_url(self.request.url))
 		else:
 			self.redirect(users.create_login_url(self.request.url))
+
 		self.response.headers['Content-Type'] = 'text/html'
-		self.response.write(MAIN_PAGE_HTML)
+		self.response.headers['Content-Type'] = 'text/html'
+		self.response.write('<h1>Your myS3 file list</h1>')
+		self.response.write('<form method="post"><TABLE BORDER="1">')
+		self.response.write('<TR><TD>Year</TD><TD>Source</TD><TD>Name</TD><TD>Time</TD><<TD>publis</TD></TR>')
+
+		qry = blobstore.BlobInfo.all()
+		for blobinfo in qry:
+			self.response.write('<TR>')	
+			self.response.write('<TD>%s</TD>' % blobinfo.filename)
+			self.response.write('<TD>%s</TD>' % str(blobinfo.creation))
+			self.response.write('<TD>')
+			#self.response.write('<button name="resource" value="%s" formaction="/myS3/download" type="submit">Download</button>' % str(blobinfo.key()))
+			#self.response.write('<button name="resource" value="%s" formaction="/myS3/delete" type="submit">Delete</button>' % str(blobinfo.key()))
+			self.response.write('</TD>')
+			self.response.write('</TR>')
+		
+		self.response.write('</TABLE></form>')
+		self.response.write('<a href="%s">Main Page</a>' %('/'))
+
 
 app = webapp2.WSGIApplication([
 	('/',MainPage),
-	('/AddPage',AddPage),
-	('/add',Add),
 ], debug=True)

@@ -2,7 +2,8 @@ import webapp2
 import datetime
 from google.appengine.api import users
 from google.appengine.ext import ndb
-
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
 
 EDIT_PAGE_HTML = """\
 <html>
@@ -25,8 +26,8 @@ class Data(ndb.Model):
 	lastupdate = ndb.StringProperty()
 	user = ndb.StringProperty()
 
-class Edit(webapp2.RequestHandler):
-	def get(self):
+class edit(blobstore_handlers.BlobstoreDownloadHandler):
+	def post(self):
 		people = users.get_current_user()
 		current = datetime.datetime.now()
 
@@ -51,6 +52,6 @@ class show(webapp2.RequestHandler):
 		self.response.write(EDIT_PAGE_HTML)
 
 app = webapp2.WSGIApplication([
-	('/', show),
-	('/edit', Edit),
+	#('/',show),
+	('/edit/edit',edit),
 ], debug=True)

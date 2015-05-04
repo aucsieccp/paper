@@ -8,9 +8,9 @@ handlers:
 #- url: /images
 #  static_dir: images 
   
-- url: /edit
+- url: /edit/.*
   script: edit.app
-- url: /paper
+- url: /paper/.*
   script: paper.app
 - url: /.*
   script: Cloud.app
