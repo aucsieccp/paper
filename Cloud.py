@@ -4,6 +4,7 @@ from google.appengine.ext import blobstore
 import webapp2
 import sys
 import datetime
+import database
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -16,20 +17,14 @@ UPLOAD_HTML = """\
 </html>
 """
 
-class Paper(ndb.Model):
-	title = ndb.StringProperty()
-	source = ndb.StringProperty()
-	name = ndb.StringProperty()
-	time = ndb.DateTimeProperty(auto_now_add=True)
-	publish_year = ndb.StringProperty()
 
 class MainPage(webapp2.RequestHandler):
 	def get(self):
 		user = users.get_current_user()
 		if user:
-			qry = Paper.query()
+			qry = database.Paper.query()
 			for a in qry:
-				self.response.write("%s-%s-%s-%s-%s<br>" %(a.publish_year,a.source,a.title,a.name,a.time))
+				self.response.write("%s-%s-%s-%s-%s-%s<br>" %(a.publish_year,a.source,a.title,a.name,a.time,a.file_key))
 			self.response.headers['Content-Type'] = 'text/html'
 			self.response.write('<a href="%s">Sign Out<a><br>' % users.create_logout_url(self.request.url))
 			self.response.headers['Content-Type'] = 'text/html'
@@ -42,20 +37,17 @@ class MainPage(webapp2.RequestHandler):
 
 		self.response.headers['Content-Type'] = 'text/html'
 		self.response.headers['Content-Type'] = 'text/html'
+		self.response.write('<h1>Your myS3 file list</h1>')
 		self.response.write('<form method="post"><TABLE BORDER="1">')
 		self.response.write('<TR><TD>Year</TD><TD>Source</TD><TD>Name</TD><TD>Time</TD><<TD>publis</TD></TR>')
 
-		qry = Paper.query()
-		for database in qry:
+		qry = blobstore.BlobInfo.all()
+		for blobinfo in qry:
 			self.response.write('<TR>')	
-			self.response.write('<TD>%s</TD>' % database.publish_year)
-			self.response.write('<TD>%s</TD>' % database.source)
-			self.response.write('<TD>%s</TD>' % database.name)
-			self.response.write('<TD>%s</TD>' % database.time)
-			self.response.write('<TD>%s</TD>' % database.title)
-			
+			self.response.write('<TD>%s</TD>' % blobinfo.filename)
+			self.response.write('<TD>%s</TD>' % str(blobinfo.creation))
 			self.response.write('<TD>')
-			self.response.write('<button name="resource" value="%s" formaction="/edit/edit" type="submit">edit</button>' %database.name)
+			#self.response.write('<button name="resource" value="%s" formaction="/myS3/download" type="submit">Download</button>' % str(blobinfo.key()))
 			#self.response.write('<button name="resource" value="%s" formaction="/myS3/delete" type="submit">Delete</button>' % str(blobinfo.key()))
 			self.response.write('</TD>')
 			self.response.write('</TR>')
