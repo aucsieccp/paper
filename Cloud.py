@@ -8,14 +8,6 @@ import database
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
-UPLOAD_HTML = """\
-<html>
-  <body>
-    <form action="%s" method="post" enctype="multipart/form-data">
-    </form>
-  </body>
-</html>
-"""
 
 
 class MainPage(webapp2.RequestHandler):
@@ -36,7 +28,7 @@ class MainPage(webapp2.RequestHandler):
 			self.redirect(users.create_login_url(self.request.url))
 
 		self.response.headers['Content-Type'] = 'text/html'
-		self.response.headers['Content-Type'] = 'text/html'
+		self.response.write('<br><button name="clean" value="clean" form action="/clean_page" type="submit">Clean</button>')
 		self.response.write('<h1>Your myS3 file list</h1>')
 		self.response.write('<form method="post"><TABLE BORDER="1">')
 		self.response.write('<TR><TD>Year</TD><TD>Source</TD><TD>Name</TD><TD>Time</TD><<TD>publis</TD></TR>')
@@ -53,9 +45,23 @@ class MainPage(webapp2.RequestHandler):
 			self.response.write('</TR>')
 		
 		self.response.write('</TABLE></form>')
+		
+class Clean_Data(webapp2.RequestHandler):
+	def get(self):
+		ndb.delete_multi(
+		database.Paper.query().fetch(keys_only=True)
+		)
+		
+		qry = blobstore.BlobInfo.all()
+		for blobinfo in qry:
+			blobinfo.delete()
+			
+		self.response.headers['Content-Type'] = 'text/html'
+		self.response.write('Clean sucess<br>')
 		self.response.write('<a href="%s">Main Page</a>' %('/'))
 
 
 app = webapp2.WSGIApplication([
 	('/',MainPage),
+	('/clean_page',Clean_Data),
 ], debug=True)

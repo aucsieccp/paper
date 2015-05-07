@@ -13,8 +13,14 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 		blob_info = upload_files[0]
 		self.response.headers['Content-Type'] = 'text/html'
 		pp = str(blob_info.key())
-		file_name = self.request.get('resource')
-		#self.response.write('<h1>%s!</h1>' % file_name)
+		key = self.request.get('resource')
+		
+		self.response.write('<h1>%s!</h1>' % key)
+		#test = database.Paper.get(title == file_name)
+		#test = database.Paper.query(database.Paper.title == file_name).fetch()
+		gg = database.Paper(id=key)
+		gg.file_key = pp;
+		gg.put()
 		#new_paper = database.Paper(file_key=pp)
 		#new_paper_key = new_paper.put()
 		

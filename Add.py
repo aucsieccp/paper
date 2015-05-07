@@ -28,7 +28,7 @@ Add_HTML = """\
 		<form action="%s" method="post" enctype="multipart/form-data">
 		Upload File: 	<input type="file" name="file"><br>
 						<input type="submit" name="file_name" value="Upload!!">
-						<input type="name" name="resource" value="%s">
+						<input name="resource" value="%s"></input>
 		</form>
 	</body>
 </html>
@@ -50,7 +50,7 @@ class Add(webapp2.RequestHandler):
 		new_paper = database.Paper(name=name,publish_year=publish_year,title=title,source=source)
 		new_paper_key = new_paper.put()
 		upload_url = blobstore.create_upload_url('/upload/upload')
-		self.response.write(Add_HTML % (upload_url,title))
+		self.response.write(Add_HTML % (upload_url,new_paper.key.id()))
 		self.response.headers['Content-Type'] = 'text/html'
 
 app = webapp2.WSGIApplication([
