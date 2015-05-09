@@ -10,11 +10,13 @@ handlers:
   
 - url: /Add/.*
   script: Add.app
-- url: /upload/.*
+- url: /File/.*
   script: upload.app
-- url: /edit
-  script: edit.app
+- url: /edit/.*
+  script: Edit.app
 - url: /paper
   script: paper.app
+- url: /file_list/.*
+  script: file_list.app
 - url: /.*
   script: Cloud.app

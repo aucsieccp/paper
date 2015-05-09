@@ -15,20 +15,7 @@ AddPage_HTML = """\
 			<div>Publish year:<br><input name="publish_year" rows="3" cols="60"></input></div>
 			<div>Source:<br><input name="source" rows="3" cols="60"></input></div>
 			<div>Title:<br><input name="title" rows="3" cols="60"></input></div>
-			<div><input type="submit" value="Upload"></div>
-		</form>
-	</body>
-</html>
-
-"""
-
-Add_HTML = """\
-<html>
-	<body>
-		<form action="%s" method="post" enctype="multipart/form-data">
-		Upload File: 	<input type="file" name="file"><br>
-						<input type="submit" name="file_name" value="Upload!!">
-						<input name="resource" value="%s"></input>
+			<div><input type="submit" value="Add"></div>
 		</form>
 	</body>
 </html>
@@ -47,10 +34,10 @@ class Add(webapp2.RequestHandler):
 		publish_year = self.request.get('publish_year')
 		source = self.request.get('source')
 		title = self.request.get('title')
-		new_paper = database.Paper(name=name,publish_year=publish_year,title=title,source=source)
+		new_paper = database.Paper(id=title,name=name,publish_year=publish_year,title=title,source=source)
 		new_paper_key = new_paper.put()
-		upload_url = blobstore.create_upload_url('/upload/upload')
-		self.response.write(Add_HTML % (upload_url,new_paper.key.id()))
+		self.response.write('Sucess')
+		self.response.write('<br><a href="%s">Main Page</a>' %('/'))
 		self.response.headers['Content-Type'] = 'text/html'
 
 app = webapp2.WSGIApplication([

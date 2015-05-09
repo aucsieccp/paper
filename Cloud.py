@@ -9,30 +9,77 @@ import database
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+Upload_HTML = """\
+<html>
+	<body>
+		<form action="%s" method="post" enctype="multipart/form-data">
+		<div>Uplaod Paper Title <input name="resource" value="%s"></input><div>
+		Upload File: 	<input type="file" name="file"><br>
+						<input type="submit" name="file_name" value="Upload!!">
+		</form>
+	</body>
+</html>
+
+"""
 
 class MainPage(webapp2.RequestHandler):
 	def get(self):
 		user = users.get_current_user()
 		if user:
 			qry = database.Paper.query()
+			self.response.write('<form method="post"><TABLE BORDER="1">')
+			self.response.write('	<TR><TD>Year</TD> \
+										<TD>Source</TD><TD>title</TD><TD>Time</TD><<TD>Paper</TD><TD>ppt</TD><TD>Edit</TD><TD>Delete</TD>	\
+									</TR>')
 			for a in qry:
-				self.response.write("%s-%s-%s-%s-%s-%s<br>" %(a.publish_year,a.source,a.title,a.name,a.time,a.file_key))
+				self.response.write('<TR>')
+				self.response.write('<TD>%s</TD>' % a.publish_year)
+				self.response.write('<TD>%s</TD>' % a.source)
+				self.response.write('<TD>%s</TD>' % a.title)
+				self.response.write('<TD>%s</TD>' % a.time)
+				if a.file_key == None:
+					self.response.write('<TD>')
+					self.response.write('<button name="resource" value="%s" button formaction="/Upload_page" type="submit">Upload_Paper</button>' % a.title)
+					self.response.write('</TD>')
+				else:
+					self.response.write('<TD>')
+					self.response.write('<button name="resource" value="%s" button formaction="/File/DownLoad" type="submit">DownLoad</button>' % a.file_key)
+					self.response.write('</TD>')
+				if a.file_ppt == None:
+					self.response.write('<TD>')
+					self.response.write('<button name="resource" value="%s" button formaction="/Upload_ppt_page" type="submit">Upload_ppt</button>' % a.title)
+					self.response.write('</TD>')
+				else:
+					self.response.write('<TD>')
+					self.response.write('<button name="resource" value="%s" button formaction="/File/DownLoad" type="submit">DownLoad</button>' % a.file_ppt)
+					self.response.write('</TD>')
+				self.response.write('<TD>')
+				self.response.write('<button name="resource" value="%s" button formaction="/edit/edit_page" type="submit">Edit</button>' % a.key.id())
+				self.response.write('</TD>')
+				self.response.write('<TD>')
+				self.response.write('	<form action="/File/Delete" method="post"> \
+											<input type="hidden" name="id" value="%s"></input> \
+											<input type="hidden" name="paper" value="%s"></input> \
+											<input type="hidden" name="ppt" value="%s"></input> \
+											<input type="submit" value="Delete"> \
+										</form>' % (a.key.id(),a.file_key,a.file_ppt))
+				self.response.write('</TD>')
+				self.response.write('</TR>')
 			self.response.headers['Content-Type'] = 'text/html'
 			self.response.write('<a href="%s">Sign Out<a><br>' % users.create_logout_url(self.request.url))
 			self.response.headers['Content-Type'] = 'text/html'
 			self.response.write('	<form method="post"> \
 										<button formaction="/Add/AddPage" type="submit">add</button> \
 									</form>')
-			self.response.write('<a href="%s">Logout</a>' % users.create_logout_url(self.request.url))
+			self.response.write('<br><a href="%s">Logout</a>' % users.create_logout_url(self.request.url))
 		else:
 			self.redirect(users.create_login_url(self.request.url))
 
 		self.response.headers['Content-Type'] = 'text/html'
-		self.response.write('<br><button name="clean" value="clean" form action="/clean_page" type="submit">Clean</button>')
+		self.response.write('<br><button name="clean" value="clean" button formaction="/clean_page" type="submit">Clean</button>')
 		self.response.write('<h1>Your myS3 file list</h1>')
 		self.response.write('<form method="post"><TABLE BORDER="1">')
 		self.response.write('<TR><TD>Year</TD><TD>Source</TD><TD>Name</TD><TD>Time</TD><<TD>publis</TD></TR>')
-
 		qry = blobstore.BlobInfo.all()
 		for blobinfo in qry:
 			self.response.write('<TR>')	
@@ -47,7 +94,7 @@ class MainPage(webapp2.RequestHandler):
 		self.response.write('</TABLE></form>')
 		
 class Clean_Data(webapp2.RequestHandler):
-	def get(self):
+	def post(self):
 		ndb.delete_multi(
 		database.Paper.query().fetch(keys_only=True)
 		)
@@ -60,8 +107,23 @@ class Clean_Data(webapp2.RequestHandler):
 		self.response.write('Clean sucess<br>')
 		self.response.write('<a href="%s">Main Page</a>' %('/'))
 
-
+class  Upload_page(webapp2.RequestHandler):
+	def post(self):
+		title = self.request.get('resource')
+		upload_url = blobstore.create_upload_url('/File/upload')
+		self.response.write(Upload_HTML % (upload_url,title))
+		self.response.headers['Content-Type'] = 'text/html'
+		
+class Upload_ppt_page(webapp2.RequestHandler):
+	def post(self):
+		title = self.request.get('resource')
+		upload_url = blobstore.create_upload_url('/File/upload_ppt')
+		self.response.write(Upload_HTML % (upload_url,title))
+		self.response.headers['Content-Type'] = 'text/html'
+	
 app = webapp2.WSGIApplication([
 	('/',MainPage),
 	('/clean_page',Clean_Data),
+	('/Upload_page',Upload_page),
+	('/Upload_ppt_page',Upload_ppt_page),
 ], debug=True)

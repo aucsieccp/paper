@@ -1,5 +1,6 @@
 import webapp2
 import datetime
+import database
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
@@ -8,50 +9,40 @@ from google.appengine.ext.webapp import blobstore_handlers
 EDIT_PAGE_HTML = """\
 <html>
 	<body>
-	<form action="/edit" method="post">
-		<div>Publish Year:<textarea name="publish_year" rows="1" cols="60"></textarea></div>
-		<div>Source:<textarea name="source" rows="1" cols="60"></textarea></div>
-		<div>Title:<textarea name="title" rows="1" cols="60"></textarea></div>
-		<div><input type="submit" value="update"></div>
-		<div><input type="button" value="back"; reutrn false;></div>
+	<form action="/edit/edit" method="post">
+		<div>Publish year:<br><input name="publish_year" value="%s" rows="3" cols="60"></input></div>
+		<div>Source:<br><input name="source" value="%s" rows="3" cols="60"></input></div>
+		<div>Title:<br><input name="title" value="%s" rows="3" cols="60"></input></div>
+		<div><input type="hidden" name="id" value="%s"></div>
+		<div><input type="submit" value="edit"></div>
 	</form>
 	</body>
 </html>
 """
 
-class Data(ndb.Model):
-	publish_year = ndb.StringProperty()
-	source = ndb.StringProperty()
-	title = ndb.StringProperty()
-	lastupdate = ndb.StringProperty()
-	user = ndb.StringProperty()
-
 class edit(blobstore_handlers.BlobstoreDownloadHandler):
 	def post(self):
-		people = users.get_current_user()
-		current = datetime.datetime.now()
-
-		if people == user.query():
-			publish_year = self.request.get("publish_year")
-			source = self.request.get("source")
-			title = self.request.get("title")
-			lastupdate = self.request.get(current)
-			user = self.request.get(user)
-			newupdate = Data(publish_year=publish_year,
-				source=source,
-				title=title,
-				lastupdate=lastupdate,
-				)
-			self.response.write(people)
-		else :
-			return
+		id = self.request.get('id')
+		q = database.Paper.get_by_id(id)
+		q.publish_year = self.request.get('publish_year')
+		q.source = self.request.get('source')
+		q.title = self.request.get('title')
+		q.put()
+		self.response.write('Edit Sucess')
+		self.response.write('<br><a href="%s">Main Page</a>' %('/'))
+		self.response.headers['Content-Type'] = 'text/html'
+	
 
 class show(webapp2.RequestHandler):
-	def get(self):
+	def post(self):
+		r_id = self.request.get('resource')
+		#q = database.Paper.query(database.Paper.title == r_title)
+		q = database.Paper.get_by_id(r_id)
+		
+		self.response.write(EDIT_PAGE_HTML % (q.publish_year,q.source,q.title,r_id))
 		self.response.headers['Content-Type'] = 'text/html'
-		self.response.write(EDIT_PAGE_HTML)
 
 app = webapp2.WSGIApplication([
-	#('/',show),
+	('/edit/edit_page',show),
 	('/edit/edit',edit),
 ], debug=True)

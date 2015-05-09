@@ -13,3 +13,4 @@ class Paper(ndb.Model):
 	time = ndb.DateTimeProperty(auto_now_add=True)
 	publish_year = ndb.StringProperty()
 	file_key = ndb.StringProperty()
+	file_ppt = ndb.StringProperty()
