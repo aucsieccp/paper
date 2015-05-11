@@ -39,38 +39,34 @@ class MainPage(webapp2.RequestHandler):
 				self.response.write('<TD>%s</TD>' % a.time)
 				if a.file_key == None:
 					self.response.write('<TD>')
-					self.response.write('<button name="resource" value="%s" button formaction="/Upload_page" type="submit">Upload_Paper</button>' % a.title)
+					self.response.write('<button name="resource" value="%s" formaction="/Upload_page" type="submit">Upload_Paper</button>' % a.title)
 					self.response.write('</TD>')
 				else:
 					self.response.write('<TD>')
-					self.response.write('<button name="resource" value="%s" button formaction="/File/DownLoad" type="submit">DownLoad</button>' % a.file_key)
+					self.response.write('<button name="resource" value="%s" formaction="/File/DownLoad" type="submit">DownLoad</button>' % a.file_key)
 					self.response.write('</TD>')
 				if a.file_ppt == None:
 					self.response.write('<TD>')
-					self.response.write('<button name="resource" value="%s" button formaction="/Upload_ppt_page" type="submit">Upload_ppt</button>' % a.title)
+					self.response.write('<button name="resource" value="%s" formaction="/Upload_ppt_page" type="submit">Upload_ppt</button>' % a.title)
 					self.response.write('</TD>')
 				else:
 					self.response.write('<TD>')
-					self.response.write('<button name="resource" value="%s" button formaction="/File/DownLoad" type="submit">DownLoad</button>' % a.file_ppt)
+					self.response.write('<button name="resource" value="%s" formaction="/File/DownLoad" type="submit">DownLoad</button>' % a.file_ppt)
 					self.response.write('</TD>')
 				self.response.write('<TD>')
-				self.response.write('<button name="resource" value="%s" button formaction="/edit/edit_page" type="submit">Edit</button>' % a.key.id())
+				self.response.write('<button name="resource" value="%s" formaction="/edit/edit_page" type="submit">Edit</button>' % a.key.id())
 				self.response.write('</TD>')
 				self.response.write('<TD>')
-				self.response.write('<button name="id" value="%s" button formaction="/File/Delete" type="submit">Delete</button>' % a.key.id())
+				self.response.write('<button name="id" value="%s" formaction="/File/Delete" type="submit">Delete</button>' % a.key.id())
 				self.response.write('</TD>')
 				self.response.write('</TR>')
 				self.response.write('</TABLE></form>')
+				self.response.write('<br><button name="name" value="None" formaction="/Add/AddPage" type"submit">Add</button>')
+				self.response.write('<br><button name="clean" value="clean" formaction="/clean_page" type="submit">Clean</button>')
+			self.response.write('<br><a href="%s">Logout</a>' % users.create_logout_url(self.request.url))
 			self.response.headers['Content-Type'] = 'text/html'
-			self.response.write('	<form method="post"> \
-										<button formaction="/Add/AddPage" type="submit">add</button> \
-									</form>')
 		else:
 			self.redirect(users.create_login_url(self.request.url))
-
-		self.response.headers['Content-Type'] = 'text/html'
-		self.response.write('<br><button name="clean" value="clean" button formaction="/clean_page" type="submit">Clean</button>')
-		self.response.write('<br><a href="%s">Logout</a>' % users.create_logout_url(self.request.url))
 		
 class Clean_Data(webapp2.RequestHandler):
 	def post(self):
