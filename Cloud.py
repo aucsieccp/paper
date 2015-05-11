@@ -29,7 +29,7 @@ class MainPage(webapp2.RequestHandler):
 			qry = database.Paper.query()
 			self.response.write('<form method="post"><TABLE BORDER="1">')
 			self.response.write('	<TR><TD>Year</TD> \
-										<TD>Source</TD><TD>title</TD><TD>Time</TD><<TD>Paper</TD><TD>ppt</TD><TD>Edit</TD><TD>Delete</TD>	\
+										<TD>Source</TD><TD>title</TD><TD>Time</TD><TD>Paper</TD><TD>ppt</TD><TD>Edit</TD><TD>Delete</TD>	\
 									</TR>')
 			for a in qry:
 				self.response.write('<TR>')
@@ -60,33 +60,17 @@ class MainPage(webapp2.RequestHandler):
 				self.response.write('<button name="id" value="%s" button formaction="/File/Delete" type="submit">Delete</button>' % a.key.id())
 				self.response.write('</TD>')
 				self.response.write('</TR>')
-			self.response.headers['Content-Type'] = 'text/html'
-			self.response.write('<a href="%s">Sign Out<a><br>' % users.create_logout_url(self.request.url))
+				self.response.write('</TABLE></form>')
 			self.response.headers['Content-Type'] = 'text/html'
 			self.response.write('	<form method="post"> \
 										<button formaction="/Add/AddPage" type="submit">add</button> \
 									</form>')
-			self.response.write('<br><a href="%s">Logout</a>' % users.create_logout_url(self.request.url))
 		else:
 			self.redirect(users.create_login_url(self.request.url))
 
 		self.response.headers['Content-Type'] = 'text/html'
 		self.response.write('<br><button name="clean" value="clean" button formaction="/clean_page" type="submit">Clean</button>')
-		self.response.write('<h1>Your myS3 file list</h1>')
-		self.response.write('<form method="post"><TABLE BORDER="1">')
-		self.response.write('<TR><TD>Year</TD><TD>Source</TD><TD>Name</TD><TD>Time</TD><<TD>publis</TD></TR>')
-		qry = blobstore.BlobInfo.all()
-		for blobinfo in qry:
-			self.response.write('<TR>')	
-			self.response.write('<TD>%s</TD>' % blobinfo.filename)
-			self.response.write('<TD>%s</TD>' % str(blobinfo.creation))
-			self.response.write('<TD>')
-			#self.response.write('<button name="resource" value="%s" formaction="/myS3/download" type="submit">Download</button>' % str(blobinfo.key()))
-			#self.response.write('<button name="resource" value="%s" formaction="/myS3/delete" type="submit">Delete</button>' % str(blobinfo.key()))
-			self.response.write('</TD>')
-			self.response.write('</TR>')
-		
-		self.response.write('</TABLE></form>')
+		self.response.write('<br><a href="%s">Logout</a>' % users.create_logout_url(self.request.url))
 		
 class Clean_Data(webapp2.RequestHandler):
 	def post(self):
