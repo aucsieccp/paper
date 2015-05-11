@@ -60,9 +60,10 @@ class MainPage(webapp2.RequestHandler):
 				self.response.write('<button name="id" value="%s" formaction="/File/Delete" type="submit">Delete</button>' % a.key.id())
 				self.response.write('</TD>')
 				self.response.write('</TR>')
-				self.response.write('</TABLE></form>')
+				self.response.write('</TABLE>')
 				self.response.write('<br><button name="name" value="None" formaction="/Add/AddPage" type"submit">Add</button>')
 				self.response.write('<br><button name="clean" value="clean" formaction="/clean_page" type="submit">Clean</button>')
+				self.response.write('</form>')
 			self.response.write('<br><a href="%s">Logout</a>' % users.create_logout_url(self.request.url))
 			self.response.headers['Content-Type'] = 'text/html'
 		else:
