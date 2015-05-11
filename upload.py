@@ -53,10 +53,28 @@ class DownloadHandler(blobstore_handlers.BlobstoreDownloadHandler):
 
 class DeleteHandler(webapp2.RequestHandler):
 	def post(self):
-
+		try:
+			id = self.request.get('id')
+			q = database.Paper.get_by_id(id)
 		
-		self.response.write('Delete Sucess')
-		self.response.headers['Content-Type'] = 'text/html'
+			blob_info_paper = blobstore.get(q.file_key)
+			blob_info_paper.delete()
+		
+			blob_info_ppt = blobstore.get(q.file_ppt)
+			blob_info_ppt.delete()
+		
+			q.key.delete()
+			self.response.write('Delete Sucess<br>')
+			self.response.headers['Content-Type'] = 'text/html'
+			self.response.write('<a href="%s">Main page</a>'% ('/'))
+		except:
+			id = self.request.get('id')
+			q = database.Paper.get_by_id(id)
+			
+			q.key.delete()
+			self.response.write('Delete Sucess<br>')
+			self.response.headers['Content-Type'] = 'text/html'
+			self.response.write('<a href="%s">Main page</a>'% ('/'))
 		
 app = webapp2.WSGIApplication([
 	('/File/upload', UploadHandler),

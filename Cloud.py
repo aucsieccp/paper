@@ -57,12 +57,7 @@ class MainPage(webapp2.RequestHandler):
 				self.response.write('<button name="resource" value="%s" button formaction="/edit/edit_page" type="submit">Edit</button>' % a.key.id())
 				self.response.write('</TD>')
 				self.response.write('<TD>')
-				self.response.write('	<form action="/File/Delete" method="post"> \
-											<input type="hidden" name="id" value="%s"></input> \
-											<input type="hidden" name="paper" value="%s"></input> \
-											<input type="hidden" name="ppt" value="%s"></input> \
-											<input type="submit" value="Delete"> \
-										</form>' % (a.key.id(),a.file_key,a.file_ppt))
+				self.response.write('<button name="id" value="%s" button formaction="/File/Delete" type="submit">Delete</button>' % a.key.id())
 				self.response.write('</TD>')
 				self.response.write('</TR>')
 			self.response.headers['Content-Type'] = 'text/html'
