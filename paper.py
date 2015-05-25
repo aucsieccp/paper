@@ -11,5 +11,5 @@ class Delete(webapp2.RequestHandler):
 	
 		query = Paper.all() //刪除多筆資料
 		query.filter('name =','paper')
-		papers = query.fetch(20,20) //刪除資料
+		papers = query.fetch(15,15) //刪除資料
 		db.delete(papers)
